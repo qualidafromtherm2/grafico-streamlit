@@ -2,7 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
 
-st.set_page_config(layout="wide")  # Expande a página para toda a largura
+st.set_page_config(layout="wide")  # Usa toda a largura da página
 
 st.title("Gráfico referência")
 st.write("By Leandro Santos")
@@ -23,7 +23,7 @@ default_tri220_min      = 22.5
 default_tri220_max      = 28.5
 default_tri220_tick     = 0.5
 
-# Funções de transformação para TRI (mantidas apenas para referência visual)
+# Funções de transformação para TRI (apenas para referência visual)
 def temp_to_tri380(T, tmin, tmax):
     return (T - tmin) / (tmax - tmin) * (default_tri380_max - default_tri380_min) + default_tri380_min
 
@@ -33,11 +33,11 @@ def temp_to_tri220(T, tmin, tmax):
 # Função para gerar o gráfico com todos os parâmetros
 def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, tick_y,
                   tri380_min, tri380_max, tri380_tick, tri220_min, tri220_max, tri220_tick):
-    # Gera 13 pontos para a temperatura e para a pressão
+    # Gera 13 pontos para a temperatura e pressão
     temp = np.linspace(temp_min, temp_max, 13)
     x = np.linspace(pressao_inicial, pressao_final, 13)
     
-    # Cálculo dos valores TRI para referência (não usados para os limites, que agora são manuais)
+    # Valores TRI para referência
     tri380 = [temp_to_tri380(t, temp_min, temp_max) for t in temp]
     tri220 = [temp_to_tri220(t, temp_min, temp_max) for t in temp]
 
@@ -51,10 +51,10 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
     ax1.set_title('Temperatura da água com escalas para TRI 380 e TRI 220')
     ax1.grid(True)
     
-    # Configurações do eixo x e y (água)
+    # Configuração do eixo x e y (água)
     ax1.set_xlim(pressao_inicial, pressao_final)
     ax1.set_xticks(np.arange(pressao_inicial, pressao_final + tick_x, tick_x))
-    ax1.tick_params(axis='x', labelrotation=90)
+    ax1.tick_params(axis='x', labelrotation=90)  # Rótulos do eixo x na vertical
     
     ax1.set_ylim(temp_min, temp_max)
     ax1.set_yticks(np.arange(temp_min, temp_max + tick_y, tick_y))
@@ -78,35 +78,43 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
 
 # --- Layout da página ---
 
-# Linha superior com três colunas:
-# Coluna 1: Parâmetros da água (lado esquerdo)
-# Coluna 2: Gráfico (centro)
-# Coluna 3: Parâmetros TRI (lado direito, agora em duas colunas para TRI 380 e TRI 220)
+# Linha superior: 3 colunas
+# Coluna 1: Parâmetros da água
+# Coluna 2: Gráfico
+# Coluna 3: Parâmetros TRI (divididos em 2 sub-colunas)
 col_agua, col_graf, col_tri = st.columns([1, 3, 1])
 
 with col_agua:
-    st.subheader("Parâmetros da água")
-    agua_temp_min = st.number_input("Mínimo temperatura água", value=default_temp_min, key="agua_temp_min")
-    agua_temp_max = st.number_input("Máximo temperatura água", value=default_temp_max, key="agua_temp_max")
-    agua_tick_y   = st.number_input("Intervalo da temperatura", value=default_tick_y, key="agua_tick_y")
+    st.subheader("Temperatura da água")
+    st.text("Mínimo")
+    agua_temp_min = st.number_input("", value=default_temp_min, key="agua_temp_min")
+    st.text("Máximo")
+    agua_temp_max = st.number_input("", value=default_temp_max, key="agua_temp_max")
+    st.text("Intervalo")
+    agua_tick_y   = st.number_input("", value=default_tick_y, key="agua_tick_y")
 
 with col_tri:
     st.subheader("Parâmetros TRI")
-    # Cria duas colunas para separar TRI 380 e TRI 220
     col_tri380, col_tri220 = st.columns(2)
     with col_tri380:
         st.markdown("**TRI 380**")
-        tri380_min  = st.number_input("Mínimo", value=default_tri380_min, key="tri380_min")
-        tri380_max  = st.number_input("Máximo", value=default_tri380_max, key="tri380_max")
-        tri380_tick = st.number_input("Intervalo", value=default_tri380_tick, key="tri380_tick")
+        st.text("Mínimo")
+        tri380_min  = st.number_input("", value=default_tri380_min, key="tri380_min")
+        st.text("Máximo")
+        tri380_max  = st.number_input("", value=default_tri380_max, key="tri380_max")
+        st.text("Intervalo")
+        tri380_tick = st.number_input("", value=default_tri380_tick, key="tri380_tick")
     with col_tri220:
         st.markdown("**TRI 220**")
-        tri220_min  = st.number_input("Mínimo", value=default_tri220_min, key="tri220_min")
-        tri220_max  = st.number_input("Máximo", value=default_tri220_max, key="tri220_max")
-        tri220_tick = st.number_input("Intervalo", value=default_tri220_tick, key="tri220_tick")
+        st.text("Mínimo")
+        tri220_min  = st.number_input("", value=default_tri220_min, key="tri220_min")
+        st.text("Máximo")
+        tri220_max  = st.number_input("", value=default_tri220_max, key="tri220_max")
+        st.text("Intervalo")
+        tri220_tick = st.number_input("", value=default_tri220_tick, key="tri220_tick")
 
 with col_graf:
-    # Placeholder para o gráfico atualizado in place
+    # Placeholder para o gráfico que será atualizado in place
     graph_placeholder = st.empty()
     fig = gerar_grafico(default_pressao_inicial, default_pressao_final,
                         agua_temp_min, agua_temp_max,
@@ -115,15 +123,18 @@ with col_graf:
                         tri220_min, tri220_max, tri220_tick)
     graph_placeholder.pyplot(fig)
 
-# Linha inferior para os parâmetros de pressão, dispostos horizontalmente.
+# Linha inferior para os parâmetros de pressão (organizados horizontalmente)
 st.subheader("Parâmetros de pressão")
 col_pressao1, col_pressao2, col_pressao3 = st.columns(3)
 with col_pressao1:
-    pressao_inicial = st.number_input("Mínimo Pressão inicial", value=default_pressao_inicial, key="pressao_inicial")
+    st.text("Mínimo")
+    pressao_inicial = st.number_input("", value=default_pressao_inicial, key="pressao_inicial")
 with col_pressao2:
-    pressao_final   = st.number_input("Máximo Pressão final", value=default_pressao_final, key="pressao_final")
+    st.text("Máximo")
+    pressao_final   = st.number_input("", value=default_pressao_final, key="pressao_final")
 with col_pressao3:
-    pressao_tick = st.number_input("Intervalo da pressão", value=default_tick_x, key="pressao_tick")
+    st.text("Intervalo")
+    pressao_tick = st.number_input("", value=default_tick_x, key="pressao_tick")
 
 # Atualiza o gráfico in place com os novos parâmetros
 fig = gerar_grafico(pressao_inicial, pressao_final,
