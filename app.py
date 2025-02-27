@@ -33,11 +33,11 @@ def temp_to_tri220(T, tmin, tmax):
 # Função para gerar o gráfico com todos os parâmetros
 def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, tick_y,
                   tri380_min, tri380_max, tri380_tick, tri220_min, tri220_max, tri220_tick):
-    # Gera 13 pontos para a temperatura e pressão
+    # Gera 13 pontos para a temperatura e para a pressão
     temp = np.linspace(temp_min, temp_max, 13)
     x = np.linspace(pressao_inicial, pressao_final, 13)
     
-    # Valores TRI para referência (apenas para plotagem, os limites serão os inputs)
+    # Valores TRI para referência (apenas para plotagem; os limites serão os inputs)
     tri380 = [temp_to_tri380(t, temp_min, temp_max) for t in temp]
     tri220 = [temp_to_tri220(t, temp_min, temp_max) for t in temp]
 
@@ -51,10 +51,10 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
     ax1.set_title('Temperatura da água com escalas para TRI 380 e TRI 220')
     ax1.grid(True)
     
-    # Configurações dos eixos para a água
+    # Configurações do eixo para a água
     ax1.set_xlim(pressao_inicial, pressao_final)
     ax1.set_xticks(np.arange(pressao_inicial, pressao_final + tick_x, tick_x))
-    ax1.tick_params(axis='x', labelrotation=90)
+    ax1.tick_params(axis='x', labelrotation=90)  # Rótulos do eixo x na vertical
     ax1.set_ylim(temp_min, temp_max)
     ax1.set_yticks(np.arange(temp_min, temp_max + tick_y, tick_y))
     
@@ -80,74 +80,59 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
 # Linha superior: 3 colunas
 # Coluna 1: Parâmetros da água (Temperatura da água)
 # Coluna 2: Gráfico
-# Coluna 3: Parâmetros TRI (divididos em duas sub-colunas: TRI 380 e TRI 220)
+# Coluna 3: Parâmetros TRI (organizados em duas sub-colunas: TRI 380 e TRI 220)
 col_agua, col_graf, col_tri = st.columns([1, 3, 1])
 
 with col_agua:
     st.subheader("Temperatura da água")
-    # Cada parâmetro em uma linha com 2 colunas (rótulo e input)
-    row = st.columns([0.7, 1])
-    with row[0]:
-        st.write("Mínimo")
-    with row[1]:
-        agua_temp_min = st.number_input("", value=default_temp_min, key="agua_temp_min", label_visibility="collapsed")
-    
-    row = st.columns([0.7, 1])
-    with row[0]:
-        st.write("Máximo")
-    with row[1]:
-        agua_temp_max = st.number_input("", value=default_temp_max, key="agua_temp_max", label_visibility="collapsed")
-    
-    row = st.columns([0.7, 1])
-    with row[0]:
-        st.write("Intervalo")
-    with row[1]:
-        agua_tick_y = st.number_input("", value=default_tick_y, key="agua_tick_y", label_visibility="collapsed")
+    # Usando contêineres para cada linha de rótulo+input (sem nested columns fora de um container)
+    with st.container():
+        c1, c2 = st.columns([0.7, 1])
+        c1.write("Mínimo")
+        agua_temp_min = c2.number_input("", value=default_temp_min, key="agua_temp_min", label_visibility="collapsed")
+    with st.container():
+        c1, c2 = st.columns([0.7, 1])
+        c1.write("Máximo")
+        agua_temp_max = c2.number_input("", value=default_temp_max, key="agua_temp_max", label_visibility="collapsed")
+    with st.container():
+        c1, c2 = st.columns([0.7, 1])
+        c1.write("Intervalo")
+        agua_tick_y = c2.number_input("", value=default_tick_y, key="agua_tick_y", label_visibility="collapsed")
 
 with col_tri:
     st.subheader("Parâmetros TRI")
-    # Cria duas colunas para separar TRI 380 e TRI 220
+    # Criando duas colunas lado a lado para TRI 380 e TRI 220
     col_tri380, col_tri220 = st.columns(2)
     
     with col_tri380:
         st.markdown("**TRI 380**")
-        row = st.columns([0.7, 1])
-        with row[0]:
-            st.write("Mínimo")
-        with row[1]:
-            tri380_min = st.number_input("", value=default_tri380_min, key="tri380_min", label_visibility="collapsed")
-        
-        row = st.columns([0.7, 1])
-        with row[0]:
-            st.write("Máximo")
-        with row[1]:
-            tri380_max = st.number_input("", value=default_tri380_max, key="tri380_max", label_visibility="collapsed")
-        
-        row = st.columns([0.7, 1])
-        with row[0]:
-            st.write("Intervalo")
-        with row[1]:
-            tri380_tick = st.number_input("", value=default_tri380_tick, key="tri380_tick", label_visibility="collapsed")
+        with st.container():
+            cc1, cc2 = st.columns([0.7, 1])
+            cc1.write("Mínimo")
+            tri380_min = cc2.number_input("", value=default_tri380_min, key="tri380_min", label_visibility="collapsed")
+        with st.container():
+            cc1, cc2 = st.columns([0.7, 1])
+            cc1.write("Máximo")
+            tri380_max = cc2.number_input("", value=default_tri380_max, key="tri380_max", label_visibility="collapsed")
+        with st.container():
+            cc1, cc2 = st.columns([0.7, 1])
+            cc1.write("Intervalo")
+            tri380_tick = cc2.number_input("", value=default_tri380_tick, key="tri380_tick", label_visibility="collapsed")
     
     with col_tri220:
         st.markdown("**TRI 220**")
-        row = st.columns([0.7, 1])
-        with row[0]:
-            st.write("Mínimo")
-        with row[1]:
-            tri220_min = st.number_input("", value=default_tri220_min, key="tri220_min", label_visibility="collapsed")
-        
-        row = st.columns([0.7, 1])
-        with row[0]:
-            st.write("Máximo")
-        with row[1]:
-            tri220_max = st.number_input("", value=default_tri220_max, key="tri220_max", label_visibility="collapsed")
-        
-        row = st.columns([0.7, 1])
-        with row[0]:
-            st.write("Intervalo")
-        with row[1]:
-            tri220_tick = st.number_input("", value=default_tri220_tick, key="tri220_tick", label_visibility="collapsed")
+        with st.container():
+            cc1, cc2 = st.columns([0.7, 1])
+            cc1.write("Mínimo")
+            tri220_min = cc2.number_input("", value=default_tri220_min, key="tri220_min", label_visibility="collapsed")
+        with st.container():
+            cc1, cc2 = st.columns([0.7, 1])
+            cc1.write("Máximo")
+            tri220_max = cc2.number_input("", value=default_tri220_max, key="tri220_max", label_visibility="collapsed")
+        with st.container():
+            cc1, cc2 = st.columns([0.7, 1])
+            cc1.write("Intervalo")
+            tri220_tick = cc2.number_input("", value=default_tri220_tick, key="tri220_tick", label_visibility="collapsed")
 
 with col_graf:
     # Placeholder para o gráfico (atualizado in place)
