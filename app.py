@@ -279,14 +279,15 @@ with col_graph2:
 st.subheader("Configuração de Pressão baixa")
 col_pb1, col_pb2, col_pb3 = st.columns(3)
 with col_pb1:
-    st.write("Máximo")
-    pb_max = st.number_input("", value=95, key="pb_max", label_visibility="collapsed")
-with col_pb2:
     st.write("Mínimo")
     pb_min = st.number_input("", value=26, key="pb_min", label_visibility="collapsed")
+with col_pb2:
+    st.write("Máximo")
+    pb_max = st.number_input("", value=95, key="pb_max", label_visibility="collapsed")
 with col_pb3:
     st.write("Intervalo")
     pb_tick = st.number_input("", value=10, key="pb_tick", label_visibility="collapsed")
+
 
 fig2 = gerar_grafico_sem_tri(
     pressao_inicial=pb_min,
