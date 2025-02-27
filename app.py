@@ -40,6 +40,8 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
     # Configurações do eixo x e y (esquerdo)
     ax1.set_xlim(pressao_inicial, pressao_final)
     ax1.set_xticks(np.arange(pressao_inicial, pressao_final + tick_x, tick_x))
+    ax1.tick_params(axis='x', labelrotation=90)  # Rota os rótulos do eixo x para 90 graus (vertical)
+    
     ax1.set_ylim(temp_min, temp_max)
     ax1.set_yticks(np.arange(temp_min, temp_max + tick_y, tick_y))
     
@@ -62,14 +64,14 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
 
 # --- Layout da página ---
 
-# Primeiro, cria uma linha com duas colunas: 
+# Cria uma linha com duas colunas:
 # - Na coluna da esquerda, os parâmetros da água (dispostos verticalmente).
 # - Na coluna da direita, o gráfico.
 col_esquerda, col_direita = st.columns([1, 3])
 
 with col_esquerda:
     st.subheader("Parâmetros da água")
-    # Esses inputs serão dispostos verticalmente
+    # Inputs referentes à água (temperatura)
     agua_temp_min = st.number_input("Mínimo temperatura água", value=default_temp_min, key="agua_temp_min")
     agua_temp_max = st.number_input("Máximo temperatura água", value=default_temp_max, key="agua_temp_max")
     agua_tick_y   = st.number_input("Intervalo da temperatura", value=default_tick_y, key="agua_tick_y")
@@ -78,14 +80,12 @@ with col_direita:
     # Cria um placeholder para o gráfico (ele será atualizado in place)
     graph_placeholder = st.empty()
     # Exibe o gráfico com os parâmetros atuais
-    # Aqui usamos valores default inicialmente (os inputs abaixo serão utilizados para atualizar)
     fig = gerar_grafico(default_pressao_inicial, default_pressao_final,
                         agua_temp_min, agua_temp_max,
                         default_tick_x, agua_tick_y)
     graph_placeholder.pyplot(fig)
 
-# Em seguida, abaixo do gráfico, cria uma linha para os parâmetros de pressão,
-# dispostos horizontalmente (um ao lado do outro).
+# Linha inferior para os parâmetros de pressão, dispostos horizontalmente.
 st.subheader("Parâmetros de pressão")
 col_pressao1, col_pressao2, col_pressao3 = st.columns(3)
 with col_pressao1:
@@ -96,9 +96,6 @@ with col_pressao3:
     pressao_tick = st.number_input("Intervalo da pressão", value=default_tick_x, key="pressao_tick")
 
 # --- Atualização do gráfico em tempo real ---
-
-# Toda vez que algum dos valores for alterado, o script é reexecutado,
-# atualizando o gráfico no mesmo placeholder.
 fig = gerar_grafico(pressao_inicial, pressao_final,
                     agua_temp_min, agua_temp_max,
                     pressao_tick, agua_tick_y)
