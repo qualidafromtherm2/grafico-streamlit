@@ -71,13 +71,13 @@ st.pyplot(fig)
 with st.form(key="input_form"):
     col1, col2 = st.columns(2)
     with col1:
-        pressao_inicial = st.number_input("Pressão inicial", value=default_pressao_inicial)
-        temp_min = st.number_input("Mínimo eixo y", value=default_temp_min)
-        tick_x = st.number_input("Intervalo dos ticks do eixo x", value=default_tick_x)
+        pressao_inicial = st.number_input("Mínimo Pressão inicial", value=default_pressao_inicial)
+        temp_min = st.number_input("Mínimo temperatura agua", value=default_temp_min)
+        tick_x = st.number_input("Intervalo da pressão alta", value=default_tick_x)
     with col2:
-        pressao_final = st.number_input("Pressão final", value=default_pressao_final)
-        temp_max = st.number_input("Máximo eixo y", value=default_temp_max)
-        tick_y = st.number_input("Intervalo dos ticks do eixo y", value=default_tick_y)
+        pressao_final = st.number_input("Máximo Pressão final", value=default_pressao_final)
+        temp_max = st.number_input("Máximo temperatura agua", value=default_temp_max)
+        tick_y = st.number_input("Intervalo da temperatura da agua", value=default_tick_y)
     submit = st.form_submit_button(label="Atualizar gráfico")
 
 # Se o formulário for enviado, atualiza o gráfico com os novos parâmetros
