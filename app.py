@@ -1,157 +1,126 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import ConnectionPatch
-import uuid
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide")  # Usa toda a largura da página
 
-# --------------------------------------------------
-# Header with "By Leandro Santos" and a button to add a record
-# --------------------------------------------------
 st.title("Gráfico referência")
+# Cabeçalho com "By Leandro Santos" e o botão de adicionar registro
 col_header = st.columns([8, 2])
 with col_header[0]:
     st.write("By Leandro Santos")
-
-# Controller to show/hide the expander
-if "show_expander" not in st.session_state:
-    st.session_state["show_expander"] = False
-
 with col_header[1]:
     if st.button("Adicionar Registro"):
-        st.session_state["show_expander"] = True
-
-# --------------------------------------------------
-# Expander with a form to insert a new record
-# --------------------------------------------------
-if st.session_state["show_expander"]:
-    with st.expander("Novo Registro", expanded=True):
-        with st.form("registro_form"):
-            temp_val = st.number_input("Temperatura da água", value=30.0, step=0.1)
-            pressao_val = st.number_input("Parâmetros de pressão", value=250.0, step=1.0)
-            tri_modelo = st.radio("Modelo TRI", options=["TRI 380", "TRI 220"])
-            tri_valor = st.number_input("Valor TRI", value=12.4, step=0.1)
-            
-            enviar = st.form_submit_button("Enviar Registro")
-            if enviar:
+        with st.expander("Novo Registro", expanded=True):
+            temp_reg = st.number_input("Temperatura da água", value=20.0, step=0.1, key="temp_reg")
+            modelo = st.radio("Parâmetros TRI", options=["TRI 380", "TRI 220"], key="modelo")
+            pressao_reg = st.number_input("Parâmetros de pressão", value=200.0, step=1.0, key="pressao_reg")
+            if st.button("Enviar Registro"):
                 if "registros" not in st.session_state:
                     st.session_state["registros"] = []
                 st.session_state["registros"].append({
-                    "temp": temp_val,
-                    "pressao": pressao_val,
-                    "tri_modelo": tri_modelo,
-                    "tri_valor": tri_valor
+                    "temperatura": temp_reg,
+                    "modelo": modelo,
+                    "pressao": pressao_reg
                 })
                 st.success("Registro adicionado!")
-                st.session_state["show_expander"] = False
-                # Force re-run by updating query parameters.
-                try:
-                    st.set_query_params(_=str(uuid.uuid4()))
-                except AttributeError:
-                    try:
-                        st.query_params = {"_": str(uuid.uuid4())}
-                    except Exception:
-                        st.experimental_set_query_params(_=str(uuid.uuid4()))
-                st.stop()
+                st.experimental_rerun()
 
-# --------------------------------------------------
-# Fixed parameters for the base graph
-# --------------------------------------------------
+# Valores default para os parâmetros do gráfico
 default_pressao_inicial = 180
 default_pressao_final   = 300
 default_temp_min        = 16
 default_temp_max        = 40
-default_tick_x          = 10    # x-axis interval (pressure)
-default_tick_y          = 2     # y-axis interval (water)
+default_tick_x          = 10    # intervalo para eixo x (pressão)
+default_tick_y          = 2     # intervalo para eixo y (água)
 
-# Axes for TRI 380 (first right axis)
 default_tri380_min      = 9.5
 default_tri380_max      = 15.5
 default_tri380_tick     = 0.5
 
-# Axes for TRI 220 (second right axis)
 default_tri220_min      = 22.5
 default_tri220_max      = 28.5
 default_tri220_tick     = 0.5
 
-# --------------------------------------------------
-# Function to generate the graph
-# --------------------------------------------------
-def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, tick_y):
-    # Generate 13 points for the base line (Temperature vs. Pressure)
+# Funções de transformação para TRI (apenas para referência visual)
+def temp_to_tri380(T, tmin, tmax):
+    return (T - tmin) / (tmax - tmin) * (default_tri380_max - default_tri380_min) + default_tri380_min
+
+def temp_to_tri220(T, tmin, tmax):
+    return (T - tmin) / (tmax - tmin) * (default_tri220_max - default_tri220_min) + default_tri220_min
+
+# Função para gerar o gráfico, que inclui a linha principal e os registros (scatter)
+def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, tick_y,
+                  tri380_min, tri380_max, tri380_tick, tri220_min, tri220_max, tri220_tick):
+    # Gera 13 pontos para a linha principal (temperatura vs. pressão)
     temp = np.linspace(temp_min, temp_max, 13)
     x = np.linspace(pressao_inicial, pressao_final, 13)
+    
+    # Valores TRI para referência (apenas para plotagem da linha)
+    tri380 = [temp_to_tri380(t, temp_min, temp_max) for t in temp]
+    tri220 = [temp_to_tri220(t, temp_min, temp_max) for t in temp]
 
     fig, ax1 = plt.subplots(figsize=(8,6))
-    # Base line: water temperature (blue)
+    
+    # Linha principal: Temperatura da água
     ax1.plot(x, temp, marker='o', color='blue', label='Temperatura da água')
     ax1.set_xlabel('Pressão alta')
     ax1.set_ylabel('Temperatura da água', color='blue')
     ax1.tick_params(axis='y', labelcolor='blue')
     ax1.set_title('Temperatura da água com escalas para TRI 380 e TRI 220')
     ax1.grid(True)
-
+    
+    # Configurações do eixo para a água
     ax1.set_xlim(pressao_inicial, pressao_final)
     ax1.set_xticks(np.arange(pressao_inicial, pressao_final + tick_x, tick_x))
-    ax1.tick_params(axis='x', labelrotation=90)
+    ax1.tick_params(axis='x', labelrotation=90)  # Rótulos do eixo x na vertical
     ax1.set_ylim(temp_min, temp_max)
     ax1.set_yticks(np.arange(temp_min, temp_max + tick_y, tick_y))
-
-    # First right axis: TRI 380
+    
+    # Eixo à direita: TRI 380
     ax2 = ax1.twinx()
     ax2.set_ylabel('TRI 380', color='red')
-    ax2.set_ylim(default_tri380_min, default_tri380_max)
+    ax2.set_ylim(tri380_min, tri380_max)
     ax2.tick_params(axis='y', labelcolor='red')
-    ax2.set_yticks(np.arange(default_tri380_min, default_tri380_max + default_tri380_tick/10, default_tri380_tick))
-
-    # Second right axis: TRI 220
+    ax2.set_yticks(np.arange(tri380_min, tri380_max + tri380_tick/10, tri380_tick))
+    
+    # Segundo eixo à direita: TRI 220
     ax3 = ax1.twinx()
     ax3.spines["right"].set_position(("axes", 1.1))
     ax3.set_ylabel('TRI 220', color='green')
-    ax3.set_ylim(default_tri220_min, default_tri220_max)
+    ax3.set_ylim(tri220_min, tri220_max)
     ax3.tick_params(axis='y', labelcolor='green')
-    ax3.set_yticks(np.arange(default_tri220_min, default_tri220_max + default_tri220_tick/10, default_tri220_tick))
-
-    # --------------------------------------------------
-    # Plot the added records
-    # --------------------------------------------------
+    ax3.set_yticks(np.arange(tri220_min, tri220_max + tri220_tick/10, tri220_tick))
+    
+    # Se houver registros adicionados, plota-os como scatter
     if "registros" in st.session_state:
         for reg in st.session_state["registros"]:
-            # Plot a point on the water axis (ax1)
-            ax1.scatter(reg["pressao"], reg["temp"], color="magenta", s=100, zorder=5)
-            # Plot a point on the TRI axis depending on the model
-            if reg["tri_modelo"] == "TRI 380":
-                ax2.scatter(reg["pressao"], reg["tri_valor"], color="red", marker="o", s=100, zorder=5)
-                con = ConnectionPatch(
-                    xyA=(reg["pressao"], reg["temp"]), coordsA=ax1.transData,
-                    xyB=(reg["pressao"], reg["tri_valor"]), coordsB=ax2.transData,
-                    color="gray", linewidth=2
-                )
-                ax2.add_artist(con)
+            # Define cor e marcador conforme o modelo
+            if reg["modelo"] == "TRI 380":
+                cor = "red"
             else:
-                ax3.scatter(reg["pressao"], reg["tri_valor"], color="green", marker="o", s=100, zorder=5)
-                con = ConnectionPatch(
-                    xyA=(reg["pressao"], reg["temp"]), coordsA=ax1.transData,
-                    xyB=(reg["pressao"], reg["tri_valor"]), coordsB=ax3.transData,
-                    color="gray", linewidth=2
-                )
-                ax3.add_artist(con)
-
+                cor = "green"
+            # Plota o registro: x = pressão, y = temperatura
+            ax1.scatter(reg["pressao"], reg["temperatura"], color=cor, marker="x", s=100, label=f"{reg['modelo']} (registro)")
     return fig
 
-# --------------------------------------------------
-# Layout for fixed parameters (unchanged from before)
-# --------------------------------------------------
+# --- Layout do Gráfico e Parâmetros ---
+# Linha superior: 3 colunas
+# Coluna 1: Parâmetros da água (Temperatura da água)
+# Coluna 2: Gráfico
+# Coluna 3: Parâmetros TRI
 col_agua, col_graf, col_tri = st.columns([1, 3, 1])
+
 with col_agua:
     st.subheader("Temperatura da água")
     row = st.columns([0.7, 1])
     row[0].write("Mínimo")
     agua_temp_min = row[1].number_input("", value=default_temp_min, key="agua_temp_min", label_visibility="collapsed")
+    
     row = st.columns([0.7, 1])
     row[0].write("Máximo")
     agua_temp_max = row[1].number_input("", value=default_temp_max, key="agua_temp_max", label_visibility="collapsed")
+    
     row = st.columns([0.7, 1])
     row[0].write("Intervalo")
     agua_tick_y = row[1].number_input("", value=default_tick_y, key="agua_tick_y", label_visibility="collapsed")
@@ -161,20 +130,37 @@ with col_tri:
     row = st.columns([1, 1])
     row[0].markdown("**TRI 380 - Mínimo**")
     tri380_min = row[1].number_input("", value=default_tri380_min, key="tri380_min", label_visibility="collapsed")
+    
     row = st.columns([1, 1])
     row[0].markdown("**TRI 380 - Máximo**")
     tri380_max = row[1].number_input("", value=default_tri380_max, key="tri380_max", label_visibility="collapsed")
+    
     row = st.columns([1, 1])
     row[0].markdown("**TRI 380 - Intervalo**")
     tri380_tick = row[1].number_input("", value=default_tri380_tick, key="tri380_tick", label_visibility="collapsed")
+    
+    row = st.columns([1, 1])
+    row[0].markdown("**TRI 220 - Mínimo**")
+    tri220_min = row[1].number_input("", value=default_tri220_min, key="tri220_min", label_visibility="collapsed")
+    
+    row = st.columns([1, 1])
+    row[0].markdown("**TRI 220 - Máximo**")
+    tri220_max = row[1].number_input("", value=default_tri220_max, key="tri220_max", label_visibility="collapsed")
+    
+    row = st.columns([1, 1])
+    row[0].markdown("**TRI 220 - Intervalo**")
+    tri220_tick = row[1].number_input("", value=default_tri220_tick, key="tri220_tick", label_visibility="collapsed")
 
 with col_graf:
     graph_placeholder = st.empty()
     fig = gerar_grafico(default_pressao_inicial, default_pressao_final,
                         agua_temp_min, agua_temp_max,
-                        default_tick_x, agua_tick_y)
+                        default_tick_x, agua_tick_y,
+                        tri380_min, tri380_max, tri380_tick,
+                        tri220_min, tri220_max, tri220_tick)
     graph_placeholder.pyplot(fig)
 
+# Linha inferior: Parâmetros de pressão, dispostos horizontalmente em 3 colunas
 st.subheader("Parâmetros de pressão")
 col_pressao1, col_pressao2, col_pressao3 = st.columns(3)
 with col_pressao1:
@@ -187,8 +173,10 @@ with col_pressao3:
     st.write("Intervalo")
     pressao_tick = st.number_input("", value=default_tick_x, key="pressao_tick", label_visibility="collapsed")
 
-# Update the graph with the fixed parameters + any records
+# Atualiza o gráfico com os parâmetros informados (incluindo registros)
 fig = gerar_grafico(pressao_inicial, pressao_final,
                     agua_temp_min, agua_temp_max,
-                    pressao_tick, agua_tick_y)
+                    pressao_tick, agua_tick_y,
+                    tri380_min, tri380_max, tri380_tick,
+                    tri220_min, tri220_max, tri220_tick)
 graph_placeholder.pyplot(fig)
