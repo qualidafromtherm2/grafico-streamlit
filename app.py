@@ -113,6 +113,7 @@ def gerar_grafico(
 
     if "registros" in st.session_state:
         for reg in st.session_state["registros"]:
+            # Ponto azul no eixo da água
             ax1.scatter(reg["pressao"], reg["temp"], color="blue", s=100, zorder=5)
             if reg["tri_modelo"] == "TRI 380":
                 ax2.scatter(reg["pressao"], reg["tri_valor"], color="red", marker="o", s=100, zorder=5)
@@ -130,6 +131,7 @@ def gerar_grafico(
                     color="gray", linewidth=2, zorder=1
                 )
                 ax3.add_artist(con)
+
     return fig
 
 # --------------------------------------------------
@@ -223,10 +225,9 @@ graph_placeholder.pyplot(fig)
 st.markdown("---")
 st.subheader("Temperatura Ambiente x Pressão baixa")
 
-# Layout para configurações independentes:
-# Coluna para Temperatura Ambiente (à esquerda do gráfico)
-col_ta, col_vazio = st.columns([1, 3])
-with col_ta:
+# Layout: 2 colunas; a primeira para os parâmetros de Temperatura Ambiente (à esquerda) e a segunda para o gráfico
+col_ta2, col_graph2 = st.columns([1, 3])
+with col_ta2:
     st.subheader("Temperatura Ambiente")
     row = st.columns([0.7, 1])
     row[0].write("Máximo")
@@ -238,8 +239,6 @@ with col_ta:
     row[0].write("Intervalo")
     ta_tick = row[1].number_input("", value=5, key="ta_tick", label_visibility="collapsed")
 
-# Gráfico: Posicionado à direita das configurações de Temperatura Ambiente
-col_vazio2, col_graph2 = st.columns([1, 3])
 with col_graph2:
     graph_placeholder2 = st.empty()
     def gerar_grafico_sem_tri(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, tick_y):
@@ -276,7 +275,7 @@ with col_graph2:
     )
     graph_placeholder2.pyplot(fig2)
 
-# Configurações de Pressão baixa: dispostas em uma linha abaixo do gráfico, com a ordem invertida (primeiro "Máximo", depois "Mínimo", depois "Intervalo")
+# Configuração de Pressão baixa (colocada abaixo do segundo gráfico)
 st.subheader("Configuração de Pressão baixa")
 col_pb1, col_pb2, col_pb3 = st.columns(3)
 with col_pb1:
@@ -289,7 +288,6 @@ with col_pb3:
     st.write("Intervalo")
     pb_tick = st.number_input("", value=10, key="pb_tick", label_visibility="collapsed")
 
-# Atualiza o segundo gráfico com as configurações de Pressão baixa
 fig2 = gerar_grafico_sem_tri(
     pressao_inicial=pb_min,
     pressao_final=pb_max,
