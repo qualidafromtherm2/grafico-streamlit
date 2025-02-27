@@ -2,6 +2,8 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import numpy as np
 
+st.set_page_config(layout="wide")  # Expande a página para usar toda a largura
+
 st.title("Gráfico referência")
 st.write("By Leandro Santos")
 
@@ -52,7 +54,7 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
     # Eixo x e y (água) com os intervalos definidos
     ax1.set_xlim(pressao_inicial, pressao_final)
     ax1.set_xticks(np.arange(pressao_inicial, pressao_final + tick_x, tick_x))
-    ax1.tick_params(axis='x', labelrotation=90)  # rótulos do eixo x na vertical
+    ax1.tick_params(axis='x', labelrotation=90)  # Rota os rótulos do eixo x para 90 graus (vertical)
     
     ax1.set_ylim(temp_min, temp_max)
     ax1.set_yticks(np.arange(temp_min, temp_max + tick_y, tick_y))
