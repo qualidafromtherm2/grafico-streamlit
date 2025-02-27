@@ -9,24 +9,22 @@ col_header = st.columns([8,2])
 with col_header[0]:
     st.write("By Leandro Santos")
 with col_header[1]:
-    if st.button("Adicionar Registro"):
-        with st.modal("Novo Registro"):
-            # Campo para Temperatura da água
-            temp_reg = st.number_input("Temperatura da água", value=20.0, step=0.1)
-            # Seleção para modelo TRI
-            modelo = st.radio("Parâmetros TRI", options=["TRI 380", "TRI 220"])
-            # Campo para Parâmetros de pressão
-            pressao_reg = st.number_input("Parâmetros de pressão", value=200.0, step=1.0)
-            if st.button("Enviar"):
-                if "registros" not in st.session_state:
-                    st.session_state["registros"] = []
-                st.session_state["registros"].append({
-                    "temperatura": temp_reg,
-                    "modelo": modelo,
-                    "pressao": pressao_reg
-                })
-                st.success("Registro adicionado!")
-                st.experimental_rerun()
+if st.button("Adicionar Registro"):
+    with st.expander("Novo Registro", expanded=True):
+        temp_reg = st.number_input("Temperatura da água", value=20.0, step=0.1)
+        modelo = st.radio("Parâmetros TRI", options=["TRI 380", "TRI 220"])
+        pressao_reg = st.number_input("Parâmetros de pressão", value=200.0, step=1.0)
+        if st.button("Enviar Registro"):
+            if "registros" not in st.session_state:
+                st.session_state["registros"] = []
+            st.session_state["registros"].append({
+                "temperatura": temp_reg,
+                "modelo": modelo,
+                "pressao": pressao_reg
+            })
+            st.success("Registro adicionado!")
+            st.experimental_rerun()
+
 
 # -------------------
 # Valores default para o gráfico
