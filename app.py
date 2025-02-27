@@ -113,11 +113,12 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
     ax3.set_yticks(np.arange(default_tri220_min, default_tri220_max + default_tri220_tick/10, default_tri220_tick))
 
     # Plot added records
+    # Plot dos registros adicionados
     if "registros" in st.session_state:
         for reg in st.session_state["registros"]:
-            # Plot point on water axis (ax1)
-            ax1.scatter(reg["pressao"], reg["temp"], color="magenta", s=100, zorder=5)
-            # Plot point on the TRI axis depending on the model
+            # Ponto na escala de Temperatura da água (ax1) agora em azul
+            ax1.scatter(reg["pressao"], reg["temp"], color="blue", s=100, zorder=5)
+            # Ponto no eixo TRI, dependendo do modelo
             if reg["tri_modelo"] == "TRI 380":
                 ax2.scatter(reg["pressao"], reg["tri_valor"], color="red", marker="o", s=100, zorder=5)
                 con = ConnectionPatch(
@@ -134,6 +135,7 @@ def gerar_grafico(pressao_inicial, pressao_final, temp_min, temp_max, tick_x, ti
                     color="gray", linewidth=2
                 )
                 ax3.add_artist(con)
+
 
     return fig
 
