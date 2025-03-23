@@ -85,7 +85,7 @@ def gerar_grafico(
     x = np.linspace(pressao_inicial, pressao_final, 13)
 
     fig, ax1 = plt.subplots(figsize=(8,6))
-    ax1.plot(x, temp, marker='o', color='blue', label='Temperatura da água')
+    ax1.plot(x, temp, color='blue', label='Temperatura da água')
     ax1.set_xlabel('Pressão alta')
     ax1.set_ylabel('Temperatura da água', color='blue')
     ax1.tick_params(axis='y', labelcolor='blue')
@@ -116,7 +116,7 @@ def gerar_grafico(
             # Ponto azul no eixo da água
             ax1.scatter(reg["pressao"], reg["temp"], color="blue", s=100, zorder=5)
             if reg["tri_modelo"] == "TRI 380":
-                ax2.scatter(reg["pressao"], reg["tri_valor"], color="red", marker="o", s=100, zorder=5)
+                ax2.scatter(reg["pressao"], reg["tri_valor"], color="red", s=100, zorder=5)
                 con = ConnectionPatch(
                     xyA=(reg["pressao"], reg["temp"]), coordsA=ax1.transData,
                     xyB=(reg["pressao"], reg["tri_valor"]), coordsB=ax2.transData,
@@ -124,7 +124,7 @@ def gerar_grafico(
                 )
                 ax2.add_artist(con)
             else:
-                ax3.scatter(reg["pressao"], reg["tri_valor"], color="green", marker="o", s=100, zorder=5)
+                ax3.scatter(reg["pressao"], reg["tri_valor"], color="green", s=100, zorder=5)
                 con = ConnectionPatch(
                     xyA=(reg["pressao"], reg["temp"]), coordsA=ax1.transData,
                     xyB=(reg["pressao"], reg["tri_valor"]), coordsB=ax3.transData,
@@ -247,7 +247,7 @@ with col_graph2:
         x = np.linspace(pressao_inicial, pressao_final, 13)
     
         fig, ax = plt.subplots(figsize=(8,6))
-        ax.plot(x, temp, marker='o', color='blue', label='Temperatura Ambiente')
+        ax.plot(x, temp, color='blue', label='Temperatura Ambiente')
         ax.set_xlabel('Pressão baixa')
         ax.set_ylabel('Temperatura Ambiente', color='blue')
         ax.tick_params(axis='y', labelcolor='blue')
