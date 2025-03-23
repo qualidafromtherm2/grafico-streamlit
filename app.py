@@ -108,29 +108,27 @@ def gerar_grafico(
 
     # Eixo para TRI 380
     ax2 = ax1.twinx()
-    ax2.set_ylabel('TRI 380', color='red')
+    ax2.set_ylabel('TRI 380', color='red', rotation=0, labelpad=10)
     ax2.set_ylim(tri380_min, tri380_max)
     ax2.set_yticks(np.arange(tri380_min, tri380_max + tri380_tick/10, tri380_tick))
-    ax2.yaxis.set_label_position("top")
-    ax2.yaxis.tick_top()
+    # Posiciona o rótulo manualmente no topo do eixo (valores podem ser ajustados)
+    ax2.yaxis.set_label_coords(0.5, 1.05)
 
     # Eixo para TRI 220
     ax3 = ax1.twinx()
     ax3.spines["right"].set_position(("axes", 1.1))
-    ax3.set_ylabel('TRI 220', color='green')
+    ax3.set_ylabel('TRI 220', color='green', rotation=0, labelpad=10)
     ax3.set_ylim(tri220_min, tri220_max)
     ax3.set_yticks(np.arange(tri220_min, tri220_max + tri220_tick/10, tri220_tick))
-    ax3.yaxis.set_label_position("top")
-    ax3.yaxis.tick_top()
+    ax3.yaxis.set_label_coords(0.5, 1.05)
 
     # Novo eixo para TRI 300
     ax4 = ax1.twinx()
     ax4.spines["right"].set_position(("axes", 1.2))
-    ax4.set_ylabel('TRI 300', color='purple')
+    ax4.set_ylabel('TRI 300', color='purple', rotation=0, labelpad=10)
     ax4.set_ylim(tri300_min, tri300_max)
     ax4.set_yticks(np.arange(tri300_min, tri300_max + tri300_tick/10, tri300_tick))
-    ax4.yaxis.set_label_position("top")
-    ax4.yaxis.tick_top()
+    ax4.yaxis.set_label_coords(0.5, 1.05)
 
     if "registros" in st.session_state:
         for reg in st.session_state["registros"]:
@@ -162,6 +160,7 @@ def gerar_grafico(
                 ax4.add_artist(con)
 
     return fig
+
 
 # --------------------------------------------------
 # Layout dos parâmetros fixos para o primeiro gráfico
